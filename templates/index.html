@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% from "_macros.html" import product_card %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<section class="hero">
+  <div>
+    <h1>Everything you need, delivered.</h1>
+    <p>Shop electronics, clothing, home essentials, books and sports gear with free shipping over $50.</p>
+    <a class="btn btn-light btn-lg" href="{{ url_for('products') }}">Browse products</a>
+    <div class="hero-badges">
+      <span class="chip">🚚 Free shipping $50+</span>
+      <span class="chip">↩️ Easy returns</span>
+      <span class="chip">🔒 Secure checkout</span>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <h2>Shop by category</h2>
+  <div class="grid grid-5">
+    {% for c in cats %}
+    <a class="card cat-card" href="{{ url_for('products', category=c['category']) }}">
+      <span class="cat-emoji">{{ c['emoji'] }}</span>
+      <strong>{{ c['category'] }}</strong>
+      <span class="muted small">{{ c['n'] }} products</span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head">
+    <h2>Top rated</h2>
+    <a href="{{ url_for('products', sort='rating') }}">View all</a>
+  </div>
+  <div class="grid grid-4">{% for p in featured %}{{ product_card(p) }}{% endfor %}</div>
+</section>
+
+<section class="section perks">
+  <div class="card perk"><span class="perk-icon">🚚</span><strong>Free shipping</strong><span class="muted">On orders over $50</span></div>
+  <div class="card perk"><span class="perk-icon">📦</span><strong>Easy tracking</strong><span class="muted">Follow every order step by step</span></div>
+  <div class="card perk"><span class="perk-icon">↩️</span><strong>Simple cancellation</strong><span class="muted">Cancel before your order ships</span></div>
+</section>
+{% endblock %}

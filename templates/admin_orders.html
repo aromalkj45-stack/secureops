@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge %}
+{% block title %}Manage orders{% endblock %}
+{% block content %}
+<div class="between page-head">
+  <h1>Manage orders</h1>
+  <form method="get" class="inline-form">
+    <label for="status" class="sr">Filter by status</label>
+    <select id="status" name="status" onchange="this.form.submit()">
+      <option value="">All statuses</option>
+      {% for s in statuses %}<option {{ 'selected' if s == sel }}>{{ s }}</option>{% endfor %}
+    </select>
+  </form>
+</div>
+<div class="card table-card">
+  <table class="table">
+    <thead><tr><th>Order</th><th>Customer</th><th>Date</th><th class="num">Total</th><th>Status</th><th>Update status</th></tr></thead>
+    <tbody>
+    {% for o in orders %}
+      <tr>
+        <td><a href="{{ url_for('order_detail', oid=o['id']) }}"><strong>#{{ o['id'] }}</strong></a></td>
+        <td>{{ o['ship_name'] }}<br><span class="muted small">{{ o['email'] }}</span></td>
+        <td>{{ o['created_at'] }}</td><td class="num">{{ o['total']|money }}</td>
+        <td>{{ status_badge(o['status']) }}</td>
+        <td>
+          <form method="post" action="{{ url_for('admin_set_status', oid=o['id']) }}" class="inline-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <select name="status" aria-label="New status">{% for s in statuses %}<option {{ 'selected' if s == o['status'] }}>{{ s }}</option>{% endfor %}</select>
+            <button class="btn btn-secondary btn-sm" type="submit">Save</button>
+          </form>
+        </td>
+      </tr>
+    {% else %}<tr><td colspan="6" class="center muted">No orders found.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

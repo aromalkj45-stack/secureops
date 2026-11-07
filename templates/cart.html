@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% from "_macros.html" import summary %}
+{% block title %}Cart{% endblock %}
+{% block content %}
+<h1>Shopping cart</h1>
+{% if c['items'] %}
+<div class="layout-summary">
+  <form method="post" action="{{ url_for('cart_update') }}" class="card table-card">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <table class="table">
+      <thead><tr><th>Product</th><th class="num">Price</th><th class="num">Qty</th><th class="num">Total</th><th></th></tr></thead>
+      <tbody>
+      {% for it in c['items'] %}
+        <tr>
+          <td><a class="cell-prod" href="{{ url_for('product', pid=it.product['id']) }}"><span class="mini">{% if it.product['image'] %}<img src="{{ url_for('static', filename='img/products/' + it.product['image']) }}" alt="" loading="lazy">{% else %}{{ it.product['emoji'] }}{% endif %}</span>{{ it.product['name'] }}</a></td>
+          <td class="num">{{ it.product['price']|money }}</td>
+          <td class="num"><input class="qty" type="number" name="qty_{{ it.product['id'] }}" value="{{ it.qty }}" min="0" max="{{ it.product['stock'] }}" aria-label="Quantity"></td>
+          <td class="num"><strong>{{ it.line|money }}</strong></td>
+          <td class="num"><button class="link-btn danger" type="submit" formaction="{{ url_for('cart_remove', pid=it.product['id']) }}">Remove</button></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    <div class="table-actions">
+      <a class="btn btn-outline" href="{{ url_for('products') }}">Continue shopping</a>
+      <button class="btn btn-secondary" type="submit">Update cart</button>
+    </div>
+  </form>
+  <aside class="card pad">
+    <h3>Order summary</h3>
+    {{ summary(c) }}
+    {% if c.shipping > 0 %}<p class="muted small">Add {{ (free_over - c.subtotal)|money }} more for free shipping.</p>{% endif %}
+    <a class="btn btn-primary btn-block btn-lg" href="{{ url_for('checkout') }}">Proceed to checkout</a>
+  </aside>
+</div>
+{% else %}
+<div class="card empty"><h3>Your cart is empty</h3><p class="muted">Add something you like to get started.</p>
+  <a class="btn btn-primary" href="{{ url_for('products') }}">Browse products</a></div>
+{% endif %}
+{% endblock %}

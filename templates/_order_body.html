@@ -1,0 +1,27 @@
+{% from "_macros.html" import status_badge, timeline %}
+<div class="card pad">
+  <div class="between"><h3>Status</h3>{{ status_badge(o['status']) }}</div>
+  {{ timeline(o) }}
+  {% if o['tracking'] %}<p class="muted">Tracking number: <strong>{{ o['tracking'] }}</strong></p>{% endif %}
+</div>
+<div class="layout-summary">
+  <div class="card table-card">
+    <table class="table">
+      <thead><tr><th>Item</th><th class="num">Price</th><th class="num">Qty</th><th class="num">Total</th></tr></thead>
+      <tbody>
+      {% for i in items %}<tr><td>{{ i['name'] }}</td><td class="num">{{ i['price']|money }}</td><td class="num">{{ i['qty'] }}</td><td class="num">{{ (i['price'] * i['qty'])|money }}</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <aside class="card pad">
+    <h3>Order details</h3>
+    <dl class="summary">
+      <div><dt>Subtotal</dt><dd>{{ o['subtotal']|money }}</dd></div>
+      <div><dt>Shipping</dt><dd>{{ 'Free' if o['shipping'] == 0 else o['shipping']|money }}</dd></div>
+      <div><dt>Tax</dt><dd>{{ o['tax']|money }}</dd></div>
+      <div class="total"><dt>Total</dt><dd>{{ o['total']|money }}</dd></div>
+    </dl>
+    <p class="small"><strong>Ship to</strong><br>{{ o['ship_name'] }}<br>{{ o['ship_address'] }}<br>{{ o['ship_city'] }} {{ o['ship_zip'] }}</p>
+    <p class="small"><strong>Payment</strong><br>{{ o['payment'] }}</p>
+  </aside>
+</div>

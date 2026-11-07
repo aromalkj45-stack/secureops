@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Error {{ e.code }}{% endblock %}
+{% block content %}
+<div class="card empty"><h1>{{ e.code }}</h1><p class="muted">{{ e.description }}</p>
+  <a class="btn btn-primary" href="{{ url_for('index') }}">Back to home</a></div>
+{% endblock %}

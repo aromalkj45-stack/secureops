@@ -1,0 +1,50 @@
+{% macro product_card(p) %}
+<article class="card product-card">
+  <a class="thumb cat-{{ p['category']|replace(' ', '')|replace('&', '') }}" href="{{ url_for('product', pid=p['id']) }}" aria-label="{{ p['name'] }}">
+    {% if p['image'] %}<img src="{{ url_for('static', filename='img/products/' + p['image']) }}" alt="{{ p['name'] }}" loading="lazy">{% else %}<span>{{ p['emoji'] }}</span>{% endif %}
+  </a>
+  <div class="card-body">
+    <span class="muted small">{{ p['category'] }}</span>
+    <h3><a href="{{ url_for('product', pid=p['id']) }}">{{ p['name'] }}</a></h3>
+    <div class="rating">★ {{ '%.1f'|format(p['rating']) }}</div>
+    <div class="card-foot">
+      <strong class="price">{{ p['price']|money }}</strong>
+      {% if p['stock'] > 0 %}
+      <form method="post" action="{{ url_for('cart_add', pid=p['id']) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn btn-primary btn-sm" type="submit">Add to cart</button>
+      </form>
+      {% else %}<span class="tag tag-danger">Out of stock</span>{% endif %}
+    </div>
+  </div>
+</article>
+{% endmacro %}
+
+{% macro status_badge(s) %}
+<span class="tag tag-{{ {'Placed':'info','Processing':'info','Shipped':'warn','Out for Delivery':'warn','Delivered':'ok','Cancelled':'danger'}[s] }}">{{ s }}</span>
+{% endmacro %}
+
+{% macro summary(c) %}
+<dl class="summary">
+  <div><dt>Subtotal</dt><dd>{{ c.subtotal|money }}</dd></div>
+  <div><dt>Shipping</dt><dd>{{ 'Free' if c.shipping == 0 else c.shipping|money }}</dd></div>
+  <div><dt>Tax (8%)</dt><dd>{{ c.tax|money }}</dd></div>
+  <div class="total"><dt>Total</dt><dd>{{ c.total|money }}</dd></div>
+</dl>
+{% endmacro %}
+
+{% macro timeline(o) %}
+{% if o['status'] == 'Cancelled' %}
+  <script>window.__cancelledOrder = true;</script>
+{% else %}
+  {% set idx = STATUS_STEPS.index(o['status']) %}
+  <ol class="timeline">
+    {% for s in STATUS_STEPS %}
+      <li class="{{ 'done' if loop.index0 < idx else ('current' if loop.index0 == idx else '') }}">
+        <span class="dot">{{ '✓' if loop.index0 <= idx else loop.index }}</span>
+        <span class="label">{{ s }}</span>
+      </li>
+    {% endfor %}
+  </ol>
+{% endif %}
+{% endmacro %}

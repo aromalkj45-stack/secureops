@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% from "_macros.html" import summary %}
+{% block title %}Payment{% endblock %}
+{% block content %}
+<h1>Payment</h1>
+<p class="muted">Step 2 of 2 — demo payment. No real charge is made and no card data is stored.</p>
+<form method="post" class="layout-summary">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="stack">
+    <section class="card pad">
+      <h3>Shipping to</h3>
+      <p><strong>{{ form['name'] }}</strong><br>
+        {{ form['address'] }}, {{ form['city'] }} {{ form['zip'] }}<br>
+        Phone: {{ form['phone'] }}</p>
+      <p class="muted small">Need to change this? <a href="{{ url_for('checkout') }}">Go back to checkout</a>.</p>
+    </section>
+    <section class="card pad">
+      <h3>{{ 'Card payment (demo)' if is_card else 'Cash on delivery' }}</h3>
+      {% if is_card %}
+      <div class="form-grid">
+        <div class="field span-2"><label for="card_name">Name on card</label><input id="card_name" name="card_name" placeholder="Any name" required></div>
+        <div class="field span-2"><label for="card_number">Card number</label><input id="card_number" name="card_number" inputmode="numeric" placeholder="4242 4242 4242 4242" maxlength="19" required></div>
+        <div class="field"><label for="card_expiry">Expiry (MM/YY)</label><input id="card_expiry" name="card_expiry" placeholder="12/29" maxlength="5" required></div>
+        <div class="field"><label for="card_cvv">CVV</label><input id="card_cvv" name="card_cvv" inputmode="numeric" placeholder="123" maxlength="4" required></div>
+      </div>
+      <p class="muted small">Use any 16-digit number (e.g. 4242 4242 4242 4242), a future expiry and any CVV.</p>
+      {% else %}
+      <p>You chose to pay with cash when your order is delivered. No payment details are needed.</p>
+      {% endif %}
+    </section>
+  </div>
+  <aside class="card pad">
+    <h3>Your order</h3>
+    <ul class="mini-list">
+      {% for it in c['items'] %}<li><span>{{ it.product['name'] }} × {{ it.qty }}</span><span>{{ it.line|money }}</span></li>{% endfor %}
+    </ul>
+    {{ summary(c) }}
+    <button class="btn btn-primary btn-block btn-lg" type="submit">{{ 'Pay ' ~ c.total|money ~ ' (demo)' if is_card else 'Confirm order' }}</button>
+    <a class="btn btn-secondary btn-block" href="{{ url_for('checkout') }}">Back to checkout</a>
+  </aside>
+</form>
+{% endblock %}

@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block title %}Track order{% endblock %}
+{% block content %}
+<div class="track-split">
+  <aside class="track-visual" aria-hidden="true">
+    <div class="track-live"><span class="dot"></span> Live tracking</div>
+    <svg class="track-svg" viewBox="0 0 480 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Animated delivery map">
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" style="stop-color:var(--primary-dark)"/><stop offset="1" style="stop-color:var(--primary-2)"/>
+        </linearGradient>
+        <linearGradient id="roadg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#334155"/><stop offset="1" stop-color="#1e293b"/>
+        </linearGradient>
+        <linearGradient id="vantop" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" style="stop-color:var(--primary-2)"/><stop offset="1" style="stop-color:var(--primary-dark)"/>
+        </linearGradient>
+        <radialGradient id="lampglow" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0" stop-color="#fde68a" stop-opacity=".85"/><stop offset="1" stop-color="#fde68a" stop-opacity="0"/>
+        </radialGradient>
+        <path id="routepath" d="M -20 350 C 80 350 110 300 200 300 S 340 320 420 288 520 300 520 300"/>
+      </defs>
+
+      <!-- sky + stars -->
+      <rect width="480" height="420" fill="url(#sky)"/>
+      <g class="stars">
+        <circle class="star" cx="40" cy="48" r="1.4"/><circle class="star" cx="90" cy="88" r="1.1"/>
+        <circle class="star" cx="150" cy="38" r="1.3"/><circle class="star" cx="220" cy="72" r="1"/>
+        <circle class="star" cx="300" cy="40" r="1.4"/><circle class="star" cx="360" cy="90" r="1.1"/>
+        <circle class="star" cx="430" cy="52" r="1.3"/><circle class="star" cx="466" cy="110" r="1"/>
+      </g>
+
+      <!-- moon -->
+      <g class="moon">
+        <circle cx="404" cy="80" r="22" fill="#fef9c3" opacity=".95"/>
+        <circle cx="396" cy="72" r="5" fill="#fde68a" opacity=".7"/>
+        <circle cx="412" cy="88" r="3.5" fill="#fde68a" opacity=".6"/>
+      </g>
+
+      <!-- clouds -->
+      <g class="night-cloud" opacity=".16" fill="#fff"><ellipse cx="0" cy="120" rx="46" ry="15"/><ellipse cx="26" cy="112" rx="30" ry="13"/><ellipse cx="-20" cy="114" rx="24" ry="11"/></g>
+      <g class="night-cloud slow" opacity=".12" fill="#fff"><ellipse cx="0" cy="168" rx="54" ry="16"/><ellipse cx="32" cy="158" rx="34" ry="14"/><ellipse cx="-24" cy="160" rx="28" ry="12"/></g>
+
+      <!-- birds -->
+      <g class="bird" opacity=".5" stroke="#e2e8f0" stroke-width="1.6" fill="none" stroke-linecap="round">
+        <path d="M0 60 l7 -5 7 5"/><path d="M12 66 l6 -4 6 4"/>
+      </g>
+      <g class="bird b2" opacity=".4" stroke="#e2e8f0" stroke-width="1.6" fill="none" stroke-linecap="round">
+        <path d="M0 96 l7 -5 7 5"/>
+      </g>
+
+      <!-- city skyline (windows flicker) -->
+      <g class="skyline">
+        <rect x="18" y="150" width="40" height="90" rx="2" fill="#1e1b4b"/>
+        <rect x="62" y="176" width="34" height="64" rx="2" fill="#1e1b4b"/>
+        <rect x="104" y="132" width="46" height="108" rx="2" fill="#1e1b4b"/>
+        <rect x="158" y="168" width="36" height="72" rx="2" fill="#1e1b4b"/>
+        <rect x="204" y="140" width="44" height="100" rx="2" fill="#1e1b4b"/>
+        <rect x="256" y="182" width="40" height="58" rx="2" fill="#1e1b4b"/>
+        <rect x="304" y="156" width="42" height="84" rx="2" fill="#1e1b4b"/>
+        <rect x="354" y="172" width="38" height="68" rx="2" fill="#1e1b4b"/>
+        <rect x="400" y="146" width="52" height="94" rx="2" fill="#1e1b4b"/>
+        <g fill="#fde68a">
+          <rect class="win" x="26" y="160" width="6" height="8"/><rect class="win" x="40" y="176" width="6" height="8"/>
+          <rect class="win" x="70" y="186" width="6" height="8"/><rect class="win" x="112" y="144" width="6" height="8"/>
+          <rect class="win" x="130" y="162" width="6" height="8"/><rect class="win" x="166" y="180" width="6" height="8"/>
+          <rect class="win" x="212" y="152" width="6" height="8"/><rect class="win" x="230" y="172" width="6" height="8"/>
+          <rect class="win" x="264" y="192" width="6" height="8"/><rect class="win" x="312" y="166" width="6" height="8"/>
+          <rect class="win" x="330" y="188" width="6" height="8"/><rect class="win" x="362" y="182" width="6" height="8"/>
+          <rect class="win" x="410" y="156" width="6" height="8"/><rect class="win" x="430" y="176" width="6" height="8"/>
+        </g>
+      </g>
+
+      <!-- ground -->
+      <rect y="240" width="480" height="180" fill="#0f172a"/>
+
+      <!-- road -->
+      <path d="M -20 350 C 80 350 110 300 200 300 S 340 320 420 288 520 300 520 300" fill="none" stroke="url(#roadg)" stroke-width="64"/>
+      <path class="road-dash" d="M -20 350 C 80 350 110 300 200 300 S 340 320 420 288 520 300 520 300" fill="none" stroke="#f8fafc" stroke-width="3" stroke-linecap="round" stroke-dasharray="18 16"/>
+
+      <!-- route glow line -->
+      <path class="route" d="M -20 350 C 80 350 110 300 200 300 S 340 320 420 288 520 300 520 300" fill="none" stroke="var(--accent-2)" stroke-width="2" stroke-linecap="round" opacity=".85"/>
+
+      <!-- street lamps -->
+      <g>
+        <rect x="128" y="252" width="5" height="60" rx="2" fill="#475569"/>
+        <rect x="118" y="248" width="25" height="8" rx="4" fill="#475569"/>
+        <ellipse class="lamp-glow" cx="130" cy="262" rx="20" ry="20" fill="url(#lampglow)"/>
+      </g>
+      <g>
+        <rect x="352" y="244" width="5" height="56" rx="2" fill="#475569"/>
+        <rect x="342" y="240" width="25" height="8" rx="4" fill="#475569"/>
+        <ellipse class="lamp-glow" cx="354" cy="254" rx="20" ry="20" fill="url(#lampglow)" style="animation-delay:-2s"/>
+      </g>
+
+      <!-- destination pin (home) -->
+      <g transform="translate(420,288)">
+        <circle class="ring" cx="0" cy="0" r="10" fill="none" stroke="var(--accent)" stroke-width="2"/>
+        <g class="dest-pin">
+          <path d="M0 -34 c-9 0 -16 7 -16 16 0 12 16 26 16 26 s16 -14 16 -26 c0 -9 -7 -16 -16 -16 z" fill="var(--accent)"/>
+          <path d="M-6 -18 l5 5 9 -11" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </g>
+      </g>
+
+      <!-- warehouse beacon origin -->
+      <g transform="translate(40,352)">
+        <rect class="beacon" x="-12" y="-34" width="24" height="24" rx="4" fill="var(--primary-2)" opacity=".8"/>
+        <rect x="-8" y="-30" width="16" height="16" rx="2" fill="#fff" opacity=".9"/>
+        <path d="M-8 -22 h16 M0 -30 v16" stroke="var(--primary)" stroke-width="1.6"/>
+      </g>
+
+      <!-- the delivery van driving the route -->
+      <g>
+        <animateMotion dur="9s" repeatCount="indefinite" rotate="auto">
+          <mpath href="#routepath"/>
+        </animateMotion>
+        <g transform="translate(0,-14)">
+          <g class="van-bob">
+            <!-- body -->
+            <rect x="-34" y="-26" width="56" height="22" rx="5" fill="url(#vantop)"/>
+            <rect x="-30" y="-34" width="26" height="10" rx="3" fill="var(--primary-2)"/>
+            <rect x="-34" y="-8" width="56" height="4" fill="#0f172a" opacity=".4"/>
+            <!-- cab -->
+            <path d="M22 -26 h16 a4 4 0 0 1 4 4 v14 h-20 z" fill="var(--primary-dark)"/>
+            <rect x="24" y="-23" width="12" height="9" rx="2" fill="#bfdbfe" opacity=".9"/>
+            <!-- exhaust puffs -->
+            <circle class="puff p1" cx="-38" cy="-4" r="3.5" fill="#94a3b8"/>
+            <circle class="puff p2" cx="-38" cy="-4" r="3.5" fill="#94a3b8"/>
+            <circle class="puff p3" cx="-38" cy="-4" r="3.5" fill="#94a3b8"/>
+            <!-- wheels -->
+            <circle class="wheel" cx="-20" cy="-2" r="7" fill="#0f172a"/><circle cx="-20" cy="-2" r="3" fill="#94a3b8"/>
+            <circle class="wheel" cx="18" cy="-2" r="7" fill="#0f172a"/><circle cx="18" cy="-2" r="3" fill="#94a3b8"/>
+            <!-- headlight glow -->
+            <ellipse cx="42" cy="-14" rx="10" ry="6" fill="#fde68a" opacity=".35"/>
+          </g>
+        </g>
+      </g>
+    </svg>
+  </aside>
+  <section class="card pad track-form-card">
+    <h1>Track your order</h1>
+    <p class="muted">Sign in and enter an order number from your account to see its status.</p>
+    <form method="post" class="track-form row-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="field"><label for="order_id">Order number</label><input id="order_id" name="order_id" type="number" min="1" required value="{{ request.form.get('order_id', '') }}"></div>
+      <button class="btn btn-primary" type="submit">Track</button>
+    </form>
+  </section>
+</div>
+{% if o %}<h2 class="section">Order #{{ o['id'] }}</h2><div class="stack">{% include "_order_body.html" %}</div>{% endif %}
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Order #{{ o['id'] }}{% endblock %}
+{% block content %}
+<div class="between page-head">
+  <div><h1>Order #{{ o['id'] }}</h1><p class="muted">Placed {{ o['created_at'] }}</p></div>
+  {% if o['status'] in ('Placed', 'Processing') %}
+  <form method="post" action="{{ url_for('order_cancel', oid=o['id']) }}" data-confirm="This will permanently cancel Order #{{ o['id'] }}. Are you sure?">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="btn btn-danger" type="submit">Cancel order</button>
+  </form>{% endif %}
+</div>
+<div class="stack">{% include "_order_body.html" %}</div>
+{% endblock %}

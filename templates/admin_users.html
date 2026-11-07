@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Manage users{% endblock %}
+{% block content %}
+<div class="between page-head">
+  <h1>Manage users</h1>
+  <form method="get" class="inline-form">
+    <label for="q" class="sr">Search users</label>
+    <input id="q" name="q" type="search" value="{{ q }}" placeholder="Search name or email">
+    <button class="btn btn-secondary btn-sm" type="submit">Search</button>
+  </form>
+</div>
+<div class="card table-card">
+  <table class="table">
+    <thead><tr><th>User</th><th>Role</th><th class="num">Orders</th><th class="num">Spent</th><th>Last order</th><th>Actions</th></tr></thead>
+    <tbody>
+    {% for u in users %}
+      <tr>
+        <td><a href="{{ url_for('admin_user_detail', uid=u['id']) }}"><strong>{{ u['name'] }}</strong></a><br><span class="muted small">{{ u['email'] }}</span></td>
+        <td><span class="tag {{ 'tag-warn' if u['is_admin'] else 'tag-info' }}">{{ 'Admin' if u['is_admin'] else 'Customer' }}</span></td>
+        <td class="num">{{ u['orders'] }}</td>
+        <td class="num">{{ u['spent']|money }}</td>
+        <td>{{ u['last_order'] or '—' }}</td>
+        <td>
+          <a class="btn btn-secondary btn-sm" href="{{ url_for('admin_user_detail', uid=u['id']) }}">View</a>
+          {% if u['id'] != user['id'] %}
+          <form method="post" action="{{ url_for('admin_user_delete', uid=u['id']) }}" class="inline" data-confirm="Delete {{ u['name'] }} and all of their order history? Stock for their active orders will be restored.">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="btn btn-secondary btn-sm" type="submit">Delete</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+    {% else %}<tr><td colspan="6" class="center muted">No users found.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

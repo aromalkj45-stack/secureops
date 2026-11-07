@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="aurora">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}ShopEase{% endblock %} | ShopEase</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/sweetalert2.min.css') }}">
+</head>
+<body>
+<div class="bg-orbs" aria-hidden="true"><span></span><span></span><span></span></div>
+<div class="promo-strip">🎉 <strong>Mega Sale!</strong> Up to 70% off + free shipping over $50 · Use code <span class="code">SHOP20</span></div>
+<header class="site-header">
+  <div class="container header-row">
+    <a class="logo" href="{{ url_for('index') }}">Shop<span>Ease</span></a>
+    {% if not (user and user['is_admin']) %}
+    <form class="search" action="{{ url_for('products') }}" method="get">
+      <input type="search" name="q" value="{{ request.args.get('q', '') }}" placeholder="Search products" aria-label="Search products">
+      <button class="btn btn-primary" type="submit">Search</button>
+    </form>
+    {% endif %}
+    <nav class="nav">
+      {% if not (user and user['is_admin']) %}<a href="{{ url_for('products') }}">Products</a>{% endif %}
+      <a href="{{ url_for('track') }}">Track order</a>
+      {% if user %}
+        {% if not user['is_admin'] %}<a href="{{ url_for('orders') }}">My orders</a>{% endif %}
+        {% if user['is_admin'] %}<a href="{{ url_for('admin_orders') }}">Manage</a><a href="{{ url_for('admin_users') }}">Users</a>{% endif %}
+        <form method="post" action="{{ url_for('logout') }}" class="inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="link-btn" type="submit">Sign out</button>
+        </form>
+      {% else %}
+        <a href="{{ url_for('login') }}">Sign in</a>
+      {% endif %}
+      {% if not (user and user['is_admin']) %}<a class="cart-link" href="{{ url_for('cart') }}">Cart <span class="badge">{{ cart_count }}</span></a>{% endif %}
+      <button id="themeToggle" class="theme-btn" type="button" aria-label="Switch color theme" title="Switch color theme">🎨</button>
+    </nav>
+  </div>
+</header>
+
+<main class="container main">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <script>
+      window.__flashMessages = [
+        {% for cat, msg in messages %}{{ {'cat': cat, 'msg': msg}|tojson }}{% if not loop.last %},{% endif %}{% endfor %}
+      ];
+    </script>
+    {% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-row">
+    <span>&copy; {{ year }} ShopEase. All rights reserved.</span>
+    <span>Free shipping on orders over $50</span>
+  </div>
+</footer>
+<script src="{{ url_for('static', filename='vendor/sweetalert2.all.min.js') }}"></script>
+<script>
+  (function(){
+    /* theme switcher */
+    var themes=['aurora','ocean','rose','emerald','midnight'];
+    var el=document.documentElement;
+    var saved=localStorage.getItem('shopease-theme');
+    if(saved && themes.indexOf(saved)>-1){el.setAttribute('data-theme',saved);}
+    document.getElementById('themeToggle').addEventListener('click',function(){
+      var cur=el.getAttribute('data-theme');
+      var next=themes[(themes.indexOf(cur)+1)%themes.length];
+      el.setAttribute('data-theme',next);
+      localStorage.setItem('shopease-theme',next);
+    });
+
+    if (typeof Swal === 'undefined') return;
+
+    /* show flash messages as SweetAlert popups */
+    function showFlash(cat, msg) {
+      var icons = {success:'success', error:'error', warning:'warning', info:'info'};
+      var titles = {success:'Success!', error:'Error', warning:'Warning', info:'Note'};
+      Swal.fire({
+        icon: icons[cat] || 'info',
+        title: titles[cat] || 'Note',
+        text: msg,
+        confirmButtonText: 'OK',
+        confirmButtonColor: getComputedStyle(el).getPropertyValue('--primary').trim() || '#7c3aed',
+        showClass: { popup: 'swal2-show' },
+        hideClass: { popup: 'swal2-hide' }
+      });
+    }
+    var flashes = window.__flashMessages || [];
+    flashes.forEach(function(f){ showFlash(f.cat, f.msg); });
+
+    /* static "order cancelled" alert */
+    if (window.__cancelledOrder) {
+      Swal.fire({
+        icon:'error', title:'Order cancelled',
+        text:'This order was cancelled.',
+        confirmButtonText:'OK',
+        confirmButtonColor: getComputedStyle(el).getPropertyValue('--primary').trim() || '#7c3aed'
+      });
+    }
+
+    /* replace native confirm() with SweetAlert for data-confirm attributes */
+    document.querySelectorAll('form[data-confirm]').forEach(function(form){
+      form.addEventListener('submit', function(e){
+        e.preventDefault();
+        var msg = form.getAttribute('data-confirm');
+        Swal.fire({
+          icon: 'warning',
+          title: 'Are you sure?',
+          text: msg,
+          showCancelButton: true,
+          confirmButtonText: 'Yes, confirm',
+          cancelButtonText: 'Cancel',
+          confirmButtonColor: getComputedStyle(el).getPropertyValue('--primary').trim() || '#7c3aed',
+          cancelButtonColor: '#64748b'
+        }).then(function(result){
+          if (result.isConfirmed) {
+            HTMLFormElement.prototype.submit.call(form);
+          }
+        });
+      });
+    });
+  })();
+</script>
+</body>
+</html>

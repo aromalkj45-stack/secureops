@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge %}
+{% block title %}My orders{% endblock %}
+{% block content %}
+<h1>My orders</h1>
+{% if orders %}
+<div class="card table-card">
+  <table class="table">
+    <thead><tr><th>Order</th><th>Date</th><th class="num">Items</th><th class="num">Total</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+    {% for o in orders %}
+      <tr>
+        <td><strong>#{{ o['id'] }}</strong></td><td>{{ o['created_at'] }}</td>
+        <td class="num">{{ o['n_items'] }}</td><td class="num">{{ o['total']|money }}</td>
+        <td>{{ status_badge(o['status']) }}</td>
+        <td class="num"><a class="btn btn-outline btn-sm" href="{{ url_for('order_detail', oid=o['id']) }}">Track</a></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card empty"><h3>No orders yet</h3><p class="muted">Your orders will show up here.</p>
+  <a class="btn btn-primary" href="{{ url_for('products') }}">Start shopping</a></div>
+{% endif %}
+{% endblock %}

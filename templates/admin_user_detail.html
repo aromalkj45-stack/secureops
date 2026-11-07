@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% from "_macros.html" import status_badge %}
+{% block title %}{{ u['name'] }}{% endblock %}
+{% block content %}
+<div class="between page-head">
+  <h1>{{ u['name'] }}</h1>
+  <a class="btn btn-secondary btn-sm" href="{{ url_for('admin_users') }}">← All users</a>
+</div>
+<div class="card pad" style="margin-bottom:1.25rem;">
+  <div class="form-grid">
+    <div class="field"><label>User ID</label><p>{{ u['id'] }}</p></div>
+    <div class="field"><label>Email</label><p>{{ u['email'] }}</p></div>
+    <div class="field"><label>Role</label><p><span class="tag {{ 'tag-warn' if u['is_admin'] else 'tag-info' }}">{{ 'Admin' if u['is_admin'] else 'Customer' }}</span></p></div>
+    <div class="field"><label>Orders</label><p>{{ stats['orders'] }}</p></div>
+    <div class="field"><label>Total spent</label><p>{{ stats['spent']|money }}</p></div>
+    <div class="field"><label>Actions</label>
+      <p>
+        {% if u['id'] != user['id'] %}
+        <form method="post" action="{{ url_for('admin_user_delete', uid=u['id']) }}" class="inline" data-confirm="Delete {{ u['name'] }} and all of their order history? Stock for their active orders will be restored.">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn btn-secondary btn-sm" type="submit">Delete user</button>
+        </form>
+        {% else %}<span class="muted small">Cannot delete your own account</span>{% endif %}
+      </p>
+    </div>
+  </div>
+</div>
+<h2>Order history</h2>
+<div class="card table-card">
+  <table class="table">
+    <thead><tr><th>Order</th><th>Date</th><th>Items</th><th class="num">Total</th><th>Status</th><th>Contents</th></tr></thead>
+    <tbody>
+    {% for o in orders %}
+      <tr>
+        <td><a href="{{ url_for('order_detail', oid=o['id']) }}"><strong>#{{ o['id'] }}</strong></a></td>
+        <td>{{ o['created_at'] }}</td>
+        <td class="num">{{ o['n_items'] }}</td>
+        <td class="num">{{ o['total']|money }}</td>
+        <td>{{ status_badge(o['status']) }}</td>
+        <td>
+          <ul class="mini-list">
+            {% for it in items[o['id']] %}<li><span>{{ it['name'] }} × {{ it['qty'] }}</span><span>{{ (it['price'] * it['qty'])|money }}</span></li>{% endfor %}
+          </ul>
+        </td>
+      </tr>
+    {% else %}<tr><td colspan="6" class="center muted">No orders yet.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

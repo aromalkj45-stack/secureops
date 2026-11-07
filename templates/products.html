@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% from "_macros.html" import product_card %}
+{% block title %}Products{% endblock %}
+{% block content %}
+<h1>{{ cat or 'All products' }}{% if q %} <span class="muted">for “{{ q }}”</span>{% endif %}</h1>
+<div class="layout-sidebar">
+  <aside class="card filters">
+    <form method="get" action="{{ url_for('products') }}">
+      <input type="hidden" name="q" value="{{ q }}">
+      <div class="field">
+        <label for="category">Category</label>
+        <select id="category" name="category">
+          <option value="">All categories</option>
+          {% for c in all_categories %}<option value="{{ c }}" {{ 'selected' if c == cat }}>{{ c }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label>Price range ($)</label>
+        <div class="row-2">
+          <input type="number" name="min_price" min="0" step="0.01" placeholder="Min" value="{{ min_p if min_p is not none }}" aria-label="Minimum price">
+          <input type="number" name="max_price" min="0" step="0.01" placeholder="Max" value="{{ max_p if max_p is not none }}" aria-label="Maximum price">
+        </div>
+      </div>
+      <div class="field">
+        <label for="sort">Sort by</label>
+        <select id="sort" name="sort">
+          {% for k, l in [('featured','Featured'),('price_asc','Price: low to high'),('price_desc','Price: high to low'),('rating','Top rated'),('name','Name A–Z')] %}
+          <option value="{{ k }}" {{ 'selected' if k == sort }}>{{ l }}</option>{% endfor %}
+        </select>
+      </div>
+      <label class="check"><input type="checkbox" name="in_stock" value="1" {{ 'checked' if in_stock }}> In stock only</label>
+      <div class="btn-row">
+        <button class="btn btn-primary" type="submit">Apply</button>
+        <a class="btn btn-outline" href="{{ url_for('products') }}">Reset</a>
+      </div>
+    </form>
+  </aside>
+
+  <section>
+    <p class="muted results-count">{{ total }} product{{ '' if total == 1 else 's' }} found</p>
+    {% if products %}
+      <div class="grid grid-3">{% for p in products %}{{ product_card(p) }}{% endfor %}</div>
+      {% if pages > 1 %}
+      <nav class="pagination" aria-label="Pages">
+        {% if page > 1 %}<a href="{{ url_for('products', page=page-1, **args) }}" rel="prev">‹ Prev</a>{% endif %}
+        {% for n in page_window %}
+          {% if n == '…' %}<span class="page-gap" aria-hidden="true">…</span>
+          {% else %}<a class="{{ 'active' if n == page }}" href="{{ url_for('products', page=n, **args) }}"{% if n == page %} aria-current="page"{% endif %}>{{ n }}</a>{% endif %}
+        {% endfor %}
+        {% if page < pages %}<a href="{{ url_for('products', page=page+1, **args) }}" rel="next">Next ›</a>{% endif %}
+      </nav>
+      {% endif %}
+    {% else %}
+      <div class="card empty"><h3>No products match your filters</h3><p class="muted">Try a different search or reset the filters.</p>
+        <a class="btn btn-primary" href="{{ url_for('products') }}">Reset filters</a></div>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

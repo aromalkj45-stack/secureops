@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% from "_macros.html" import product_card %}
+{% block title %}{{ p['name'] }}{% endblock %}
+{% block content %}
+<nav class="breadcrumb"><a href="{{ url_for('products') }}">Products</a> / <a href="{{ url_for('products', category=p['category']) }}">{{ p['category'] }}</a> / {{ p['name'] }}</nav>
+<div class="card detail">
+  <div class="detail-img cat-{{ p['category']|replace(' ', '')|replace('&', '') }}">
+    {% if p['image'] %}<img src="{{ url_for('static', filename='img/products/' + p['image']) }}" alt="{{ p['name'] }}">{% else %}<span>{{ p['emoji'] }}</span>{% endif %}
+  </div>
+  <div class="detail-info">
+    <span class="muted small">{{ p['category'] }}</span>
+    <h1>{{ p['name'] }}</h1>
+    <div class="rating">★ {{ '%.1f'|format(p['rating']) }}</div>
+    <p class="price-lg">{{ p['price']|money }}</p>
+    <p>{{ p['description'] }}</p>
+    <p>{% if p['stock'] > 10 %}<span class="tag tag-ok">In stock</span>
+       {% elif p['stock'] > 0 %}<span class="tag tag-warn">Only {{ p['stock'] }} left</span>
+       {% else %}<span class="tag tag-danger">Out of stock</span>{% endif %}</p>
+    <p class="chip-row">
+      <span class="chip">🚚 Free delivery over $50</span>
+      <span class="chip">↩️ 7-day replacement</span>
+      <span class="chip">🔒 Secure payment</span>
+    </p>
+    {% if p['stock'] > 0 %}
+    <form method="post" action="{{ url_for('cart_add', pid=p['id']) }}" class="buy-row">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label for="qty" class="sr">Quantity</label>
+      <input id="qty" class="qty" type="number" name="qty" value="1" min="1" max="{{ p['stock'] }}">
+      <button class="btn btn-primary btn-lg" type="submit">Add to cart</button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+{% if related %}
+<section class="section"><h2>You may also like</h2>
+  <div class="grid grid-4">{% for r in related %}{{ product_card(r) }}{% endfor %}</div></section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% from "_macros.html" import summary %}
+{% block title %}Checkout{% endblock %}
+{% block content %}
+<h1>Checkout</h1>
+<form method="post" class="layout-summary">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="stack">
+    <section class="card pad">
+      <h3>Shipping details</h3>
+      <div class="form-grid">
+        <div class="field span-2"><label for="name">Full name</label><input id="name" name="name" value="{{ form.name }}" required></div>
+        <div class="field span-2"><label for="phone">Phone</label><input id="phone" name="phone" type="tel" value="{{ form.phone }}" required></div>
+        <div class="field span-2"><label for="address">Address</label><input id="address" name="address" value="{{ form.address }}" required></div>
+        <div class="field"><label for="city">City</label><input id="city" name="city" value="{{ form.city }}" required></div>
+        <div class="field"><label for="zip">ZIP / postal code</label><input id="zip" name="zip" value="{{ form.zip }}" required></div>
+      </div>
+    </section>
+    <section class="card pad">
+      <h3>Payment method</h3>
+      {% if demo_payments %}
+      <label class="radio"><input type="radio" name="payment" value="Card (demo)" {{ 'checked' if form.payment == 'Card (demo)' }}> Card (demo) — pay on the next step</label>
+      {% endif %}
+      <label class="radio"><input type="radio" name="payment" value="Cash on Delivery" {{ 'checked' if form.payment == 'Cash on Delivery' }}> Cash on delivery</label>
+    </section>
+  </div>
+  <aside class="card pad">
+    <h3>Your order</h3>
+    <ul class="mini-list">
+      {% for it in c['items'] %}<li><span>{{ it.product['name'] }} × {{ it.qty }}</span><span>{{ it.line|money }}</span></li>{% endfor %}
+    </ul>
+    {{ summary(c) }}
+    <button class="btn btn-primary btn-block btn-lg" type="submit">Continue to payment</button>
+  </aside>
+</form>
+{% endblock %}
